@@ -37,22 +37,41 @@ class Radiance:
                 self.action = "archive download"
 
             if self.action != "":
-                if self.lastevent != [parsed[0], self.action]:
-                    self.lastevent = [parsed[0], self.action]
+                if self.lastevent != [parsed[0], self.action, f'{parsed[2][0]}/{parsed[2][1]}']:
+                    self.lastevent = [parsed[0], self.action, f'{parsed[2][0]}/{parsed[2][1]}']
                     await self.sendWebhook(parsed, self.action)
                 else:
                     print("Duplicate, skipped")
     
+    async def createEmbed(self, action, parsed):
+            e = Embed(title="Luminance", description=f"New {self.action}", color=Color.from_rgb(255, 188, 188))
+            e.add_field(name="User", value=f"{parsed[0]}")
+            e.add_field(name="Repository", value=f"{self.config['GITEA']['URL']}{parsed[2][0]}/{parsed[2][1]}")
+            return e
+
     async def sendWebhook(self, parsed, action):
         async with aiohttp.ClientSession() as session:
             webhook = Webhook.from_url(self.config['DISCORD']['WebhookURL'], session=session)
 
-            # Create embed
-            e = Embed(title="Luminance", description=f"New {self.action}", color=Color.from_rgb(255, 188, 188))
-            e.add_field(name="User", value=f"{parsed[0]}")
-            e.add_field(name="Repository", value=f"{self.config['GITEA']['URL']}{parsed[2][0]}/{parsed[2][1]}")
-    
-            await webhook.send(embed=e) 
+            if self.config.has_option("REPOSITORY", 'UserOrg') or self.config.has_option("REPOSITORY", 'RepositoryName'):
+                if self.config.getboolean("REPOSITORY", 'RelativeURL') == True:
+                    if f'{parsed[2][0]}/{parsed[2][1]}' == f'{self.config["REPOSITORY"]["UserOrg"]}/{self.config["REPOSITORY"]["RepositoryName"]}':
+                        embed = await self.createEmbed(action, parsed)
+                else:
+                    if self.config.has_option("REPOSITORY", 'UserOrg'):
+                        if f'{parsed[2][0]}' == f'{self.config["REPOSITORY"]["UserOrg"]}':
+                            embed = await self.createEmbed(action, parsed)
+                    elif self.config.has_option("REPOSITORY", 'RepositoryName'):
+                        if f'{parsed[2][1]}' == f'{self.config["REPOSITORY"]["RepositoryName"]}':
+                            embed = await self.createEmbed(action, parsed)
+
+            else:
+                embed = await self.createEmbed(action, parsed)
+            
+            try:
+                await webhook.send(embed=embed) 
+            except UnboundLocalError:
+                pass
 
     async def watch(self, filename):
         async for changes in awatch(filename):

@@ -4,3 +4,11 @@ AccessLog = /usr/local/bin/gitealog/access.log
 
 [DISCORD]
 WebhookURL = https://discord.com/api/webhooks/WebhookID/WebhookToken
+
+;[REPOSITORY]
+; Show event notifications for 'UserOrg/RepositoryName' only. 
+;RelativeUrl = False
+; Show event notifications for this organisation or user only 
+;UserOrg = EnderblitzsSuperSlumberParty
+; Show event notifications for this repository name only
+;RepositoryName = 
