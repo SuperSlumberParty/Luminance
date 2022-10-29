@@ -1,0 +1,6 @@
+[GITEA]
+URL = https://example.com/
+AccessLog = /usr/local/bin/gitealog/access.log
+
+[DISCORD]
+WebhookURL = https://discord.com/api/webhooks/WebhookID/WebhookToken
