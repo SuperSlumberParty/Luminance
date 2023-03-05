@@ -26,7 +26,7 @@ python -m pip install -r requirements.txt
 
 4. Edit `conf.ini.example` and save as `conf.ini`.
 
-## Configuation
+## Configuration
 Located in `conf.ini.example`, should be saved as `conf.ini`
 
 | Category | Key | Type | Description |
